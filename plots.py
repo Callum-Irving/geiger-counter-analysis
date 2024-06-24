@@ -4,7 +4,8 @@ import matplotlib.pyplot as plt
 import math
 from scipy.ndimage import gaussian_filter1d
 
-DATA_FILE = "overnight_20240621.csv"
+DATA_FILE = "data/no_source_20240621.csv"
+plt.style.use("./plotstyle.mplstyle")
 
 
 def poisson(mu, r):
@@ -34,16 +35,16 @@ min_cpm = int(cpms.min())
 max_cpm = int(cpms.max())
 bins = np.arange(min_cpm, max_cpm + 1) - 0.5
 values, _, _ = plt.hist(
-    cpms, bins=bins, histtype="step", density=True, label="recorded data"
+    cpms, bins=bins, histtype="step", density=True, label="Recorded data"
 )
 
 # Plot Poisson distribution based on mean
 probs_poisson = [poisson(mean, int(x)) for x in bins[:-1] + 0.5]
-plt.stairs(probs_poisson, edges=bins, label="theoretical Poisson")
+plt.stairs(probs_poisson, edges=bins, label="Theoretical Poisson distribution")
 
 # Plot Gaussian distribution based on mean and standard deviation
-probs_gaussian = gaussian(mean, std, bins[:-1])
-plt.stairs(probs_gaussian, edges=bins, label="theoretical Gaussian")
+# probs_gaussian = gaussian(mean, std, bins[:-1])
+# plt.stairs(probs_gaussian, edges=bins, label="theoretical Gaussian")
 
 plt.title("Counts Per Minute (CPM) Sampled at 60 Second Intervals")
 plt.xlabel("CPM")
@@ -52,13 +53,27 @@ plt.legend()
 
 # Plot time series CPMs
 plt.figure()
-plt.plot(df["Timestamp"], cpms, label="raw data")
+# plt.plot(df["Timestamp"], cpms, label="raw data")
+
+smoothish_cpms = gaussian_filter1d(cpms, sigma=5)
+plt.plot(
+    df["Timestamp"],
+    smoothish_cpms,
+    label="Smoothed with $\\sigma = 5$ minutes",
+    lw=1,
+)
 
 # Apply Gaussian filter
-smoothed_cpms = gaussian_filter1d(cpms, sigma=8)
-plt.plot(df["Timestamp"], smoothed_cpms, label="smoothed with $\\sigma = 8$")
+smoothed_cpms = gaussian_filter1d(cpms, sigma=60)
+plt.plot(
+    df["Timestamp"],
+    smoothed_cpms,
+    "--",
+    label="Smoothed with $\\sigma = 60$ minutes",
+    lw=3,
+)
 
-plt.title("CPM over Time")
+plt.title("CPM over Time with Gaussian Filter Applied")
 plt.xlabel("Timestamp")
 plt.ylabel("CPM")
 plt.legend()
