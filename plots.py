@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import math
 from scipy.ndimage import gaussian_filter1d
 
-DATA_FILE = "data/no_source_20240621.csv"
+DATA_FILE = "data/alpha_source_5mm.csv"
 plt.style.use("./plotstyle.mplstyle")
 
 
@@ -31,9 +31,10 @@ print("Variance:", var)
 print("Stdev:", std)
 
 # Histogram data (normalized)
+BINWIDTH=3
 min_cpm = int(cpms.min())
 max_cpm = int(cpms.max())
-bins = np.arange(min_cpm, max_cpm + 1) - 0.5
+bins = np.arange(min_cpm, max_cpm + 1, step=BINWIDTH) - 0.5
 values, _, _ = plt.hist(
     cpms, bins=bins, histtype="step", density=True, label="Recorded data"
 )
