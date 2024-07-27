@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import math
 from scipy.ndimage import gaussian_filter1d
 
-DATA_FILE = "data/alpha_source_5mm.csv"
+DATA_FILE = "./data/two_bananas_5mm.csv"
 plt.style.use("./plotstyle.mplstyle")
 
 
@@ -27,6 +27,7 @@ mean = cpms.mean()
 var = cpms.var()
 std = cpms.std()
 print("Mean:", mean)
+print("Uncertainty in mean:", std/np.sqrt(len(cpms)))
 print("Variance:", var)
 print("Stdev:", std)
 
