@@ -3,8 +3,12 @@ import polars as pl
 import matplotlib.pyplot as plt
 from scipy.optimize import curve_fit
 import scienceplots
+from cycler import cycler
+import matplotlib as mpl
 
-plt.style.use(["science", "notebook", "no-latex", "grid"])
+# plt.style.use(["science", "notebook", "no-latex", "grid"])
+plt.style.use(["science", "no-latex"])
+mpl.rcParams['axes.prop_cycle'] = cycler('color', ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf'])
 # plt.style.use("plotstyle.mplstyle")
 
 # Uncertainty in distance from source to tube in meters
@@ -55,24 +59,29 @@ df_background = pl.read_csv("./data/no_source_20240621.csv")
 background_cpm = df_background["CPM"].to_numpy().mean()  # to_numpy eliminate lsp warning
 background_stdev = df_background["CPM"].std(ddof=1)
 
+# plt.figure(figsize=(3.4, 3.4))
+fig, ax = plt.subplots(figsize=(3.4, 3.2))
 plt.errorbar(
-    xs, ys, xerr=xs_uncs, yerr=ys_uncs, ms=4, capsize=3, fmt="o", c="k", label="Data"
+    xs, ys, xerr=xs_uncs, yerr=ys_uncs, ms=3, capsize=3, fmt="o", c="k", label="Data"
 )
 
-plt.plot(xs_fit, ys_fit, c="r", label="Exponential decay fit")
+plt.plot(xs_fit, ys_fit, label="Exponential decay fit")
 plt.fill_between(
-    xs_fit, ys_fit - yerrs_fit, ys_fit + yerrs_fit, color="r", alpha=0.2, edgecolor=None
+    xs_fit, ys_fit - yerrs_fit, ys_fit + yerrs_fit, alpha=0.2, edgecolor=None
 )
 
 plt.plot(
-    xs_fit, np.ones(N_POINTS) * background_cpm, "--", c="b", label="Measured background"
+    xs_fit, np.ones(N_POINTS) * background_cpm, "--", label="Measured background"
 )
-plt.plot(xs_fit, np.ones(N_POINTS) * fit_params[0], "--", c="g", label="Fit background")
+plt.plot(xs_fit, np.ones(N_POINTS) * fit_params[0], "-.", label="Fit background")
 
-plt.xlabel("Distance from Source to Geiger-Muller Tube [m]")
-plt.ylabel("Radioactivity [counts per minute]")
-plt.title("Observed Radioactivity from Alpha Source at Various Distances")
+# plt.xlabel("Distance from Source to Geiger-Muller Tube [m]")
+# plt.ylabel("Radioactivity [counts per minute]")
+# plt.title("Observed Radioactivity from \n Alpha Source at Various Distances")
+plt.xlabel("Distance (m)")
+plt.ylabel("Radioactivty (CPM)")
 plt.legend()
+ax.set_xlim(0.0, 0.05)
 plt.savefig("alpha_source_distance.png", dpi=400)
 plt.show()
 
